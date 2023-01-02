@@ -8,6 +8,12 @@ It's the template for the authentication project we will be creating along using
 - MongoDB
 - React 18
 
+## Documentation
+
+- [Oficial documentation to configure Firebase project](https://firebase.google.com/docs/web/setup).
+- [Documentation to trigger google signin popup](https://firebase.google.com/docs/auth/web/google-signin).
+- [Documentation](https://firebase.google.com/docs/auth/web/manage-users) when `onAuthStateChanged` is triggered.
+
 ## Considerations
 - Within the file `.env.example` you have to create your own `.env` file with your own values.
 - This project is intended to extend the funcionality to your own backend using the google `accessToken`
