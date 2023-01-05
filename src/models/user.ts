@@ -1,8 +1,12 @@
+import { AUTH_TYPES } from "./constants";
+
 export type User = {
-    name: string;
+    id: string;
     email: string;
-    avatar: string;
+    fullName: string;
+    avatarUrl: string;
+    authType: AUTH_TYPES;
     enabled: boolean;
-    createdAt: number;
+    creationDate: number;
     accessToken: string;
 };

@@ -1,0 +1,4 @@
+export enum AUTH_TYPES {
+    GOOGLE = "GOOGLE",
+    USERNAME_PASSWORD = "USERNAME_PASSWORD"
+}
