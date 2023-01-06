@@ -1,11 +1,12 @@
 const url = process.env.REACT_APP_API_URL;
 
-function apiBuidRequestInit(accessToken, method, body) {
+function apiBuidRequestInit(accessToken, method, body, extraHeaders) {
     let requestInit = {
         method: method,
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
+            "Authorization": `Bearer ${accessToken}`,
+            ...extraHeaders
         },
         body: JSON.stringify(body),
     };
@@ -17,7 +18,7 @@ function apiBuidRequestInit(accessToken, method, body) {
 }
 
 
-export async function authenticateUser(accessToken) {
-    const request = await fetch(url + 'GoogleAuth', apiBuidRequestInit(accessToken, "POST"));
+export async function authenticateUser(accessToken, authType) {
+    const request = await fetch(url + 'Auth', apiBuidRequestInit(accessToken, "POST", {}, { 'x-auth-type': authType }));
     return await request.json();
 }

@@ -14,11 +14,12 @@ const firebaseConfig = {
 // Initialize Firebase
 initializeApp(firebaseConfig);
 const googleProvider = new GoogleAuthProvider();
-const auth = getAuth();
 
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
+
+const auth = getAuth();
 
 export const signInWithGooglePopup = () => {
   return new Promise((resolve, reject) => {
@@ -34,8 +35,7 @@ export const signInWithGooglePopup = () => {
   })
 }
 
-
-export const logout = () => {
+export const logoutFirebase = () => {
   signOut(auth);
 };
 

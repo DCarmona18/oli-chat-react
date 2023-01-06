@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from 'react';
+import { AUTH_TYPES } from '../models/constants';
 import { User } from '../models/user';
 import { authenticateUser } from '../Services/api.service';
 import { onAuthStateChangedListener } from '../Utils/firebase.utils';
@@ -25,28 +26,27 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
 
     const value = { currentUser, setCurrentUser };
-
     useEffect(() => {
-        const unsubscribe = onAuthStateChangedListener((user: any) => {
+        const unsubscribe = onAuthStateChangedListener(async (user: any) => {
             // Every time the Authentication state changes it triggers this subscription
-            console.log("User on auth changed:", user);
-
+            console.info("User auth state changed:", user);
             if (user) {
                 // The following method will create/authenticate user in the application
 
                 // TODO: Call API to Create user if not exists
-                // authenticateUser(user.accessToken)
-                //     .then((result) => {
-                //         console.log(result);
-                //         // Send accessToken to API
-                //         // It will return User
-                //         // Set user in context
-                //     })
-                //     .catch((error) => console.error(error));
+                try {
+                    const userApi: User = await authenticateUser(user.accessToken, AUTH_TYPES.GOOGLE);
+                    if (userApi !== null && userApi.id !== null) {
+                        setCurrentUser({...userApi, accessToken: user.accessToken});
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                // TODO: Handle the setCurrentUser with your own rules
+                setCurrentUser(null);
             }
 
-            // TODO: Handle the setCurrentUser with your own rules
-            // setCurrentUser(user);
         });
 
         return unsubscribe;
