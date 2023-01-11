@@ -17,8 +17,12 @@ function apiBuidRequestInit(accessToken, method, body, extraHeaders) {
     return requestInit;
 }
 
-
 export async function authenticateUser(accessToken, authType) {
     const request = await fetch(url + 'Auth', apiBuidRequestInit(accessToken, "POST", {}, { 'x-auth-type': authType }));
+    return await request.json();
+}
+
+export async function fetchConnectedUsersHub(accessToken) {
+    const request = await fetch(url + 'ChatHub', apiBuidRequestInit(accessToken, "GET"));
     return await request.json();
 }

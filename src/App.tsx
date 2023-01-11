@@ -1,15 +1,17 @@
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import AppRoutes from './AppRoutes';
+import Home from './Components/Home/Home';
+import Login from './Components/Login/Login';
+import { Navigation } from './Routes/Navigation/Navigation';
 
 const App = () => {
   return (
     <div className="App">
         <Routes>
-          {AppRoutes.map((route, index) => {
-            const { element, ...rest } = route;
-            return <Route key={index} {...rest} element={element} />;
-          })}
+          <Route index path='/' element={<Login />} />
+          <Route path='/home' element={<Navigation />}>
+            <Route index element={<Home />}/>
+          </Route>
         </Routes>
     </div>
   );

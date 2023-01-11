@@ -1,31 +1,55 @@
 import './Home.css';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logoutFirebase } from '../../Utils/firebase.utils';
 import { UserContext } from '../../Contexts/user.context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faSearch, faSmile, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import { ChatContext } from '../../Contexts/chat.context';
+import { fetchConnectedUsersHub } from '../../Services/api.service';
+import { ConnectedUser } from '../../models/connectedUser';
+import { ChatUsers } from '../ChatUsers/ChatUsers';
 
 const Home = () => {
     const { currentUser } = useContext(UserContext);
+    const { sendMessage, registerEvent, setConnectedUsers, connectedUsers, connection } = useContext(ChatContext);
+    const [message, setMessage] = useState<string>('');
+    
+    useEffect(() => {
+        if(!currentUser?.accessToken)
+            return;
+
+        // Fetch connected users to the hub
+        fetchConnectedUsersHub(currentUser?.accessToken)
+        .then((connectedUsers: ConnectedUser[])=> {
+            setConnectedUsers(connectedUsers);
+        });
+    }, [currentUser?.accessToken, setConnectedUsers]);
+
+    useEffect(() => {
+        registerEvent('ReceiveMessage', (message) => {
+            console.log("Mensaje recibido: ", message);
+        });
+    }, [registerEvent]);
+
     const navigate = useNavigate();
 
     const chatListElement = useRef<HTMLElement>();
     const chatActiveElement = useRef<HTMLElement>();
 
-
     useEffect(() => {
         if (currentUser == null)
-            navigate("/login");
+            navigate("/");
     }, [currentUser, navigate]);
 
     const onSendMessage = (e: any) => {
-        
+        console.log("Mensage enviado:", message);
+        message !== '' && sendMessage(currentUser?.id ?? 'Anonymous', message);
     };
 
     const onNewMessage = (e: any) => {
-        
+
     };
 
     const scrollChatlist = () => {
@@ -50,6 +74,7 @@ const Home = () => {
                     <img src={currentUser.avatarUrl} alt={"User profile"} className="rounded img-fluid img-thumbnail" referrerPolicy='no-referrer' />
                     <p className='w-100 m-auto'>{currentUser.fullName}</p>
                     <p className='w-100 m-auto'>{currentUser.email}</p>
+                    <p className='w-100 m-auto'>{connection?.connectionId}</p>
                     <button onClick={logoutFirebase} className='btn-lg btn btn-secondary w-100 m-auto'>Logout</button>
                 </div>
                 <section style={{ backgroundColor: "#CDC4F9" }}>
@@ -71,124 +96,7 @@ const Home = () => {
                                                     <PerfectScrollbar containerRef={el => (chatListElement.current = el)}>
                                                         <div style={{ position: "relative", height: "400px" }}>
                                                             {/* Chat list left */}
-                                                            <ul className="list-unstyled mb-0">
-                                                                <li className="p-2 border-bottom">
-                                                                    <a href="#!" className="d-flex justify-content-between text-decoration-none">
-                                                                        <div className="d-flex flex-row">
-                                                                            <div>
-                                                                                <img
-                                                                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                                                                                    alt="avatar" className="d-flex align-self-center me-3" width="60" />
-                                                                                <span className="badge bg-success badge-dot"></span>
-                                                                            </div>
-                                                                            <div className="pt-1">
-                                                                                <p className="fw-bold mb-0 text-start">Marie Horwitz</p>
-                                                                                <p className="small text-muted">Hello, Are you there?</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="pt-1">
-                                                                            <p className="small text-muted mb-1">Just now</p>
-                                                                            <span className="badge bg-danger rounded-pill float-end">3</span>
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li className="p-2 border-bottom">
-                                                                    <a href="#!" className="d-flex justify-content-between text-decoration-none">
-                                                                        <div className="d-flex flex-row">
-                                                                            <div>
-                                                                                <img
-                                                                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
-                                                                                    alt="avatar" className="d-flex align-self-center me-3" width="60" />
-                                                                                <span className="badge bg-warning badge-dot"></span>
-                                                                            </div>
-                                                                            <div className="pt-1">
-                                                                                <p className="fw-bold mb-0 text-start">Alexa Chung</p>
-                                                                                <p className="small text-muted">Lorem ipsum dolor sit.</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="pt-1">
-                                                                            <p className="small text-muted mb-1">5 mins ago</p>
-                                                                            <span className="badge bg-danger rounded-pill float-end">2</span>
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li className="p-2 border-bottom">
-                                                                    <a href="#!" className="d-flex justify-content-between text-decoration-none">
-                                                                        <div className="d-flex flex-row">
-                                                                            <div>
-                                                                                <img
-                                                                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
-                                                                                    alt="avatar" className="d-flex align-self-center me-3" width="60" />
-                                                                                <span className="badge bg-success badge-dot"></span>
-                                                                            </div>
-                                                                            <div className="pt-1">
-                                                                                <p className="fw-bold mb-0 text-start">Danny McChain</p>
-                                                                                <p className="small text-muted">Lorem ipsum dolor sit.</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="pt-1">
-                                                                            <p className="small text-muted mb-1">Yesterday</p>
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li className="p-2 border-bottom">
-                                                                    <a href="#!" className="d-flex justify-content-between text-decoration-none">
-                                                                        <div className="d-flex flex-row">
-                                                                            <div>
-                                                                                <img
-                                                                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
-                                                                                    alt="avatar" className="d-flex align-self-center me-3" width="60" />
-                                                                                <span className="badge bg-danger badge-dot"></span>
-                                                                            </div>
-                                                                            <div className="pt-1">
-                                                                                <p className="fw-bold mb-0 text-start">Ashley Olsen</p>
-                                                                                <p className="small text-muted">Lorem ipsum dolor sit.</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="pt-1">
-                                                                            <p className="small text-muted mb-1">Yesterday</p>
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li className="p-2 border-bottom">
-                                                                    <a href="#!" className="d-flex justify-content-between text-decoration-none">
-                                                                        <div className="d-flex flex-row">
-                                                                            <div>
-                                                                                <img
-                                                                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"
-                                                                                    alt="avatar" className="d-flex align-self-center me-3" width="60" />
-                                                                                <span className="badge bg-warning badge-dot"></span>
-                                                                            </div>
-                                                                            <div className="pt-1">
-                                                                                <p className="fw-bold mb-0 text-start">Kate Moss</p>
-                                                                                <p className="small text-muted">Lorem ipsum dolor sit.</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="pt-1">
-                                                                            <p className="small text-muted mb-1">Yesterday</p>
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                <li className="p-2">
-                                                                    <a href="#!" className="d-flex justify-content-between text-decoration-none">
-                                                                        <div className="d-flex flex-row">
-                                                                            <div>
-                                                                                <img
-                                                                                    src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                                                                                    alt="avatar" className="d-flex align-self-center me-3" width="60" />
-                                                                                <span className="badge bg-success badge-dot"></span>
-                                                                            </div>
-                                                                            <div className="pt-1">
-                                                                                <p className="fw-bold mb-0 text-start">Ben Smith</p>
-                                                                                <p className="small text-muted">Lorem ipsum dolor sit.</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="pt-1">
-                                                                            <p className="small text-muted mb-1">Yesterday</p>
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
+                                                            <ChatUsers connectedUsers={connectedUsers}/>
                                                         </div>
                                                     </PerfectScrollbar>
 
@@ -228,7 +136,7 @@ const Home = () => {
                                                 <div className="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2">
                                                     <a className="ms-1 text-muted" href="#!"><FontAwesomeIcon icon={faPaperclip} /></a>
                                                     <a className="ms-3 text-muted" href="#!"><FontAwesomeIcon icon={faSmile} /><i className="fas fa-smile"></i></a>
-                                                    <input type="text" className="form-control form-control-lg" id="exampleFormControlInput2"
+                                                    <input type="text" onChange={(e) => setMessage(e.target.value)} className="form-control form-control-lg" id="exampleFormControlInput2"
                                                         placeholder="Type message" />
                                                     <a className="ms-3" onClick={onSendMessage} href="#!"><FontAwesomeIcon icon={faPaperPlane} /></a>
                                                 </div>
