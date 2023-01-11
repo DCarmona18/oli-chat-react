@@ -36,6 +36,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         if (!currentUser?.accessToken) 
             return;
 
+        // TODO: Fix reconnect issue
         const options: IHttpConnectionOptions = {
             headers: { 'Authorization': `Bearer ${currentUser.accessToken}` }
         };
@@ -49,10 +50,8 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
     }, [currentUser]);
 
     useEffect(() => {
-        if (!currentUser?.accessToken && connection) {
-            connection.stop();
+        if ((!currentUser?.accessToken && connection) || connection?.state === HubConnectionState.Connected)
             return;
-        }
 
         if (connection && connection?.state === HubConnectionState.Disconnected) {
             connection.start()
@@ -82,7 +81,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
 
     const sendMessage = async (user: string, message: string) => {
         const chatMessage = {
-            user: currentUser?.id ?? 'AnonymousUser',
+            userIdSender: currentUser?.id ?? 'AnonymousUser',
             message: message
         };
 

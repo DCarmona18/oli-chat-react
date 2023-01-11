@@ -23,8 +23,6 @@ interface Props {
 
 export const UserProvider: React.FC<Props> = ({ children }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    console.log("Init user context...");
-    
 
     const value = { currentUser, setCurrentUser };
     useEffect(() => {
@@ -48,8 +46,5 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
 
         return unsubscribe;
     }, []);
-
-
-
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 };
