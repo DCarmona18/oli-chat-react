@@ -22,18 +22,16 @@ interface Props {
 }
 
 export const UserProvider: React.FC<Props> = ({ children }) => {
-
     const [currentUser, setCurrentUser] = useState<User | null>(null);
+    console.log("Init user context...");
+    
 
     const value = { currentUser, setCurrentUser };
     useEffect(() => {
         const unsubscribe = onAuthStateChangedListener(async (user: any) => {
             // Every time the Authentication state changes it triggers this subscription
-            console.info("User auth state changed:", user);
             if (user) {
                 // The following method will create/authenticate user in the application
-
-                // TODO: Call API to Create user if not exists
                 try {
                     const userApi: User = await authenticateUser(user.accessToken, AUTH_TYPES.GOOGLE);
                     if (userApi !== null && userApi.id !== null) {
@@ -43,7 +41,6 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
                     console.error(error);
                 }
             } else {
-                // TODO: Handle the setCurrentUser with your own rules
                 setCurrentUser(null);
             }
 
@@ -51,5 +48,8 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
 
         return unsubscribe;
     }, []);
+
+
+
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 };
