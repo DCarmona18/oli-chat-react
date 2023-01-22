@@ -10,7 +10,7 @@ const Login = () => {
     const navigate = useNavigate();
     useEffect(() => {
         if(currentUser !== null)
-            navigate("/home");
+            navigate("/");
     }, [currentUser, navigate])
 
     const onFormSubmit = (e: React.SyntheticEvent) => {

@@ -22,7 +22,12 @@ export async function authenticateUser(accessToken, authType) {
     return await request.json();
 }
 
-export async function fetchConnectedUsersHub(accessToken) {
-    const request = await fetch(url + 'ChatHub', apiBuidRequestInit(accessToken, "GET"));
+export async function fetchFriends(accessToken) {
+    const request = await fetch(url + 'Friend', apiBuidRequestInit(accessToken, "GET"));
+    return await request.json();
+}
+
+export async function addFriend(email, accessToken) {
+    const request = await fetch(url + 'Friend', apiBuidRequestInit(accessToken, "POST", { email }));
     return await request.json();
 }

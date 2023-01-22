@@ -1,9 +1,9 @@
 import { FC } from 'react';
-import { ConnectedUser } from '../../models/connectedUser';
+import { Friend } from '../../models/friend';
 import './ChatUser.css'
 
 type ChatUserProps = {
-    user: ConnectedUser
+    user: Friend
 };
 
 

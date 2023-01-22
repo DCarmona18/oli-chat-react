@@ -2,23 +2,23 @@ import { HubConnectionBuilder, IHttpConnectionOptions } from "@microsoft/signalr
 import { HubConnection, HubConnectionState } from "@microsoft/signalr/dist/esm/HubConnection";
 import { LogLevel } from "@microsoft/signalr/dist/esm/ILogger";
 import { createContext, useContext, useEffect, useState } from "react";
-import { ConnectedUser } from "../models/connectedUser";
+import { Friend } from "../models/friend";
 import { UserContext } from "./user.context";
 
 interface IChatContext {
     connection: HubConnection | null;
-    connectedUsers: ConnectedUser[];
+    friends: Friend[];
     sendMessage: (user: string, message: string) => void;
     registerEvent: (methodName: string, callback: (...args: any[]) => void) => void;
-    setConnectedUsers: (connectedUsers: ConnectedUser[]) => void;
+    setFriends: (friends: Friend[]) => void;
 }
 
 const defaultState: IChatContext = {
     connection: null,
-    connectedUsers: [],
+    friends: [],
     sendMessage: () => { },
     registerEvent: () => { },
-    setConnectedUsers: () => { }
+    setFriends: () => { }
 };
 
 interface Props {
@@ -29,55 +29,75 @@ export const ChatContext = createContext<IChatContext>(defaultState);
 
 export const ChatProvider: React.FC<Props> = ({ children }) => {
     const [connection, setConnection] = useState<HubConnection | null>(null);
-    const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
+    const [friends, setFriends] = useState<Friend[]>([]);
     const { currentUser } = useContext(UserContext);
-    
+
     useEffect(() => {
-        if (!currentUser?.accessToken) 
+        console.log("[TAG]Setting connection:", currentUser);
+
+        if (!currentUser?.accessToken)
             return;
 
-        // TODO: Fix reconnect issue
         const options: IHttpConnectionOptions = {
             headers: { 'Authorization': `Bearer ${currentUser.accessToken}` }
         };
         const newConnection = new HubConnectionBuilder()
             .withUrl(`${process.env.REACT_APP_API_URL}hubs/chat`, options)
             .withAutomaticReconnect()
-            .configureLogging(LogLevel.Critical)
+            .configureLogging(LogLevel.Information)
             .build();
-        
+
         setConnection(newConnection);
     }, [currentUser]);
 
     useEffect(() => {
-        if ((!currentUser?.accessToken && connection) || connection?.state === HubConnectionState.Connected)
-            return;
+        console.info("[TAG] Setting up signalR");
 
-        if (connection && connection?.state === HubConnectionState.Disconnected) {
-            connection.start()
-                .then(async () => {
-                    if (connection?.state === HubConnectionState.Connected) {
-                        try {
-                            console.log("Connected");
-                            registerEvent('ConnectedToHub', (user: ConnectedUser) => {
-                                console.log("Connected to hub:", user);
-                                if (user.connectionId !== connection.connectionId && user.email !== currentUser?.email)
-                                    setConnectedUsers([user].concat(connectedUsers));
-                            });
-                        }
-                        catch (e) {
-                            // TODO: Handle errors
-                            console.log(e);
-                        }
-                    }
-                })
-                .catch(e => {
+        async function setUpSignalR() {
+            if (connection) {
+                try {
+                    await connection.start();
+                } catch (error) {
                     // TODO: Handle errors
-                    console.log('Connection failed: ', e);
-                });
+                    console.log('Connection failed: ', error);
+                }
+                console.log("[TAG] Connection state:", connection.state, connection.connectionId);
+            }
         }
+
+        setUpSignalR();
+
+        return () => {
+            console.info("[TAG] Disconnecting:", connection?.state, connection?.connectionId)
+            connection?.stop();
+        }
+    }, [connection]);
+
+    useEffect(() => {
+        registerEvent('ConnectedToHub', (user: Friend) => {
+            console.info("[TAG] Connected to hub:", user);
+            // TODO: Set status of friend to online when connected
+            // if (user.connectionId !== connection?.connectionId && user.email !== currentUser?.email)
+            //     setFriends([user].concat(friends));
+        });
+        registerEvent('DisconnectedFromHub', (user: Friend) => {
+            console.info("[TAG] Disconnected from Hub:", user);
+            // TODO: Set status of friend to offline when disconnected
+            // setFriends(friends.filter((connectedUser: Friend) => connectedUser.userId !== user.userId))
+        });
+        connection?.onreconnecting((error) => {
+            console.info("[TAG] Reconnecting");
+        });
+
+        connection?.onreconnected(() => {
+            console.info("[TAG] Reconnected");
+        });
+
+        connection?.onclose(() => {
+            console.info("[TAG] OnClose");
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [connectedUsers, connection, currentUser]);
+    }, [friends, connection?.connectionId, currentUser?.email]);
 
     const sendMessage = async (user: string, message: string) => {
         const chatMessage = {
@@ -105,6 +125,6 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         connection?.on(methodName, callback);
     };
 
-    const value = { connection, connectedUsers, sendMessage, registerEvent, setConnectedUsers };
+    const value = { connection, friends, sendMessage, registerEvent, setFriends };
     return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
 };
