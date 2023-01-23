@@ -3,14 +3,15 @@ import { Friend } from '../../models/friend';
 import './ChatUser.css'
 
 type ChatUserProps = {
-    user: Friend
+    user: Friend,
+    onClick: (friend: Friend) => void
 };
 
 
-export const ChatUser : FC<ChatUserProps> = ({user}) => {
+export const ChatUser : FC<ChatUserProps> = ({user, onClick}) => {
 
     const startChat = () => {
-        console.log(user);
+        onClick(user);
     };
 
     return (

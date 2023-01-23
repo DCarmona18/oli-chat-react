@@ -7,7 +7,11 @@ import { fetchFriends } from '../../Services/api.service';
 import { ChatContext } from '../../Contexts/chat.context';
 import { UserContext } from '../../Contexts/user.context';
 
-export const UsersList: FC = () => {
+export type UsersListProps = {
+    onChatInitializer: (friend: Friend) => void
+};
+
+export const UsersList: FC<UsersListProps> = ({onChatInitializer}) => {
     const { setFriends, friends } = useContext(ChatContext);
     const { currentUser } = useContext(UserContext);
 
@@ -38,7 +42,7 @@ export const UsersList: FC = () => {
                 <ul className="list-unstyled mb-0">
                     {
                         friends && friends.map((friend: Friend, index) => (
-                            <ChatUser key={index} user={friend} />
+                            <ChatUser key={index} onClick={onChatInitializer} user={friend} />
                         ))
                     }
                 </ul>

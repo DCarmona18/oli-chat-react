@@ -18,11 +18,11 @@ const Home = () => {
     const { currentUser } = useContext(UserContext);
     const { sendMessage, connection, setFriends, friends } = useContext(ChatContext);
     const [show, setShow] = useState(false);
-
+    const [userToChat, setUserToChat] = useState<Friend | undefined>(undefined);
     const handleClose = () => {
         setShow(false);
         setEmailNewFriend('');
-    }
+    };
 
     const handleShow = () => setShow(true);
 
@@ -36,7 +36,9 @@ const Home = () => {
     }, [currentUser, navigate]);
 
     const onSendMessage = (message: string) => {
-        message !== '' && sendMessage(currentUser?.id ?? 'Anonymous', message);
+        userToChat !== undefined && 
+        message !== '' &&
+        sendMessage(userToChat.userId, message);
     };
 
     const addFriend = async () => {
@@ -61,6 +63,12 @@ const Home = () => {
             console.error(error);
         }
     };
+
+    const initializeChat = (friend: Friend) => {
+        console.log("Initializing chat with:", friend);
+        
+        setUserToChat(friend);
+    }
 
     return (<>
         {currentUser &&
@@ -117,15 +125,14 @@ const Home = () => {
                                                             <FontAwesomeIcon icon={faSearch} />
                                                         </span>
                                                     </div>
-                                                    <UsersList />
+                                                    <UsersList onChatInitializer={initializeChat} />
                                                 </div>
                                             </div>
                                             <div className="col-md-6 col-lg-7 col-xl-8">
-                                                <Messages fromAvatarUrl={currentUser.avatarUrl} toAvatarUrl={'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp'} />
+                                                <Messages key={'ChatMessages'} userToChat={userToChat} connectedUser={currentUser} />
                                                 <Textbox key={'textBox'} onSendMessage={(message) => onSendMessage(message)} />
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>

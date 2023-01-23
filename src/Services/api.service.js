@@ -31,3 +31,8 @@ export async function addFriend(email, accessToken) {
     const request = await fetch(url + 'Friend', apiBuidRequestInit(accessToken, "POST", { email }));
     return await request.json();
 }
+
+export async function getMessages(messagesWith, accessToken) {
+    const request = await fetch(url + 'Messages?with='+messagesWith  , apiBuidRequestInit(accessToken, "GET"));
+    return await request.json();
+}

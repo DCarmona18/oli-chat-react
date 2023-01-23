@@ -27,6 +27,7 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
     const value = { currentUser, setCurrentUser };
     useEffect(() => {
         const unsubscribe = onAuthStateChangedListener(async (user: any) => {
+            console.info('[TAG] Authstatechanged:', user);
             // Every time the Authentication state changes it triggers this subscription
             if (user) {
                 // The following method will create/authenticate user in the application

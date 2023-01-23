@@ -3,38 +3,77 @@ import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { MessageItem, MessageItemProps } from '../MessageItem/MessageItem';
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { ChatContext } from '../../Contexts/chat.context';
+import { Friend } from '../../models/friend';
+import { ChatMessage } from '../../models/chatMessage';
+import { User } from '../../models/user';
+import { MessageCategory } from '../../models/messageCategory';
+import { getMessages } from '../../Services/api.service';
 
 export type MessagesProps = {
-    fromAvatarUrl: string,
-    toAvatarUrl: string
+    userToChat?: Friend,
+    connectedUser: User
 };
 
-export const Messages: FC<MessagesProps> = ({ fromAvatarUrl, toAvatarUrl }) => {
+export const Messages: FC<MessagesProps> = ({ userToChat, connectedUser }) => {
     const { registerEvent } = useContext(ChatContext);
     const chatActiveElement = useRef<HTMLElement>();
     const [messages, setMessages] = useState<MessageItemProps[]>([]);
+
     useEffect(() => {
 
-        registerEvent('ReceiveMessage', (messageData) => {
-            const message: MessageItemProps = {
-                text: messageData.message,
-                time: Date.now(),
-                avatarUrl: messageData.avatarUrl,
-                type: 'INCOMING'
-            }
-            setMessages([...messages, message])
-        });
+        async function fetchMessages(userToChat: Friend) {
+            var result: ChatMessage[] = await getMessages(userToChat.userId, connectedUser.accessToken);
+            var messages: MessageItemProps[] = result.map(messageToMessageProp);
+            setMessages(messages);
+        }
 
-        registerEvent('SentMessage', (messageData) => {
+        if (userToChat !== undefined) {
+            // TODO: Fetch messages yield return 
+            fetchMessages(userToChat);
+        } else {
+            // Clean messages
+            setMessages([]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userToChat]);
+
+    const messageToMessageProp = (messageData: ChatMessage): MessageItemProps => {
+        let type: MessageCategory = 'SENT';
+        let avatarUrl = connectedUser.avatarUrl;
+        if (messageData.to === connectedUser.id) {
+            type = 'INCOMING';
+            avatarUrl = userToChat?.avatarUrl ?? '';
+        }
+
+        const message: MessageItemProps = {
+            id: messageData.id!,
+            text: messageData.message,
+            time: new Date(Date.parse(messageData.sentAt?.toString() ?? '')).getTime(),
+            avatarUrl: avatarUrl,
+            type: type
+        }
+        return message;
+    }
+
+    useEffect(() => {
+        registerEvent('ReceiveMessage', (messageData: ChatMessage) => {
+            let type: MessageCategory = 'SENT';
+            let avatarUrl = connectedUser.avatarUrl;
+            if (messageData.to === connectedUser.id) {
+                type = 'INCOMING';
+                avatarUrl = userToChat?.avatarUrl ?? '';
+            }
+
             const message: MessageItemProps = {
+                id: messageData.id!,
                 text: messageData.message,
-                time: Date.now(),
-                avatarUrl: messageData.avatarUrl,
-                type: 'SENT'
+                time: new Date(Date.parse(messageData.sentAt?.toString() ?? '')).getTime(),
+                avatarUrl: avatarUrl,
+                type: type
             }
             setMessages([...messages, message])
         });
-    }, [messages, registerEvent]);
+    }, [connectedUser.avatarUrl, connectedUser.id, messages, registerEvent, userToChat?.avatarUrl]);
 
     useEffect(() => {
         const curr = chatActiveElement.current;

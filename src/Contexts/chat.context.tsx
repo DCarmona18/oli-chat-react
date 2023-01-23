@@ -2,13 +2,14 @@ import { HubConnectionBuilder, IHttpConnectionOptions } from "@microsoft/signalr
 import { HubConnection, HubConnectionState } from "@microsoft/signalr/dist/esm/HubConnection";
 import { LogLevel } from "@microsoft/signalr/dist/esm/ILogger";
 import { createContext, useContext, useEffect, useState } from "react";
+import { ChatMessage } from "../models/chatMessage";
 import { Friend } from "../models/friend";
 import { UserContext } from "./user.context";
 
 interface IChatContext {
     connection: HubConnection | null;
     friends: Friend[];
-    sendMessage: (user: string, message: string) => void;
+    sendMessage: (to: string, message: string) => void;
     registerEvent: (methodName: string, callback: (...args: any[]) => void) => void;
     setFriends: (friends: Friend[]) => void;
 }
@@ -99,12 +100,14 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [friends, connection?.connectionId, currentUser?.email]);
 
-    const sendMessage = async (user: string, message: string) => {
-        const chatMessage = {
-            userIdSender: currentUser?.id ?? 'AnonymousUser',
-            message: message
+    const sendMessage = async (to: string, message: string) => {
+        // TODO: Structure the message object
+        const chatMessage: ChatMessage = {
+            to,
+            message,
+            type: 'PLAIN_TEXT'
         };
-
+        
         if (connection?.state === HubConnectionState.Connected) {
             try {
                 await connection.send('SendMessage', chatMessage);
