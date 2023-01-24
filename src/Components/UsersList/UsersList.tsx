@@ -28,14 +28,15 @@ export const UsersList: FC<UsersListProps> = ({onChatInitializer}) => {
         });
     }, [currentUser?.accessToken, setFriends]);
 
-    const scrollChatlist = () => {
-        const curr = chatListElement.current;
-        if (curr) {
-            curr.scrollTo({
-                top: 0
-            });
-        }
-    };
+    // const scrollChatlist = () => {
+    //     const curr = chatListElement.current;
+    //     if (curr) {
+    //         curr.scrollTo({
+    //             top: 0
+    //         });
+    //     }
+    // };
+    
     return (
         <PerfectScrollbar containerRef={el => (chatListElement.current = el)}>
             <div style={{ position: "relative", height: "400px" }}>
