@@ -32,14 +32,14 @@ jobs:
           node-version: '16.x'
       - name: Generate .env file
         run: |
-          echo "REACT_APP_API_URL=${{ REACT_APP_API_URL }}" >> .env
-          echo "REACT_APP_GOOGLE_CLIENT_ID=${{ REACT_APP_GOOGLE_CLIENT_ID }}" >> .env
-          echo "REACT_APP_FIREBASE_APIKEY=${{ REACT_APP_FIREBASE_APIKEY }}" >> .env
-          echo "REACT_APP_FIREBASE_AUTHDOMAIN=${{ REACT_APP_FIREBASE_AUTHDOMAIN }}" >> .env
-          echo "REACT_APP_FIREBASE_PROJECTID=${{ REACT_APP_FIREBASE_PROJECTID }}" >> .env
-          echo "REACT_APP_FIREBASE_STORAGEBUCKET=${{ REACT_APP_FIREBASE_STORAGEBUCKET }}" >> .env
-          echo "REACT_APP_FIREBASE_MESSAGINGSENDERID=${{ REACT_APP_FIREBASE_MESSAGINGSENDERID }}" >> .env
-          echo "REACT_APP_FIREBASE_APPID=${{ REACT_APP_FIREBASE_APPID }}" >> .env
+          echo "REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}" >> .env
+          echo "REACT_APP_GOOGLE_CLIENT_ID=${{ env.REACT_APP_GOOGLE_CLIENT_ID }}" >> .env
+          echo "REACT_APP_FIREBASE_APIKEY=${{ env.REACT_APP_FIREBASE_APIKEY }}" >> .env
+          echo "REACT_APP_FIREBASE_AUTHDOMAIN=${{ env.REACT_APP_FIREBASE_AUTHDOMAIN }}" >> .env
+          echo "REACT_APP_FIREBASE_PROJECTID=${{ env.REACT_APP_FIREBASE_PROJECTID }}" >> .env
+          echo "REACT_APP_FIREBASE_STORAGEBUCKET=${{ env.REACT_APP_FIREBASE_STORAGEBUCKET }}" >> .env
+          echo "REACT_APP_FIREBASE_MESSAGINGSENDERID=${{ env.REACT_APP_FIREBASE_MESSAGINGSENDERID }}" >> .env
+          echo "REACT_APP_FIREBASE_APPID=${{ env.REACT_APP_FIREBASE_APPID }}" >> .env
 
       - name: npm install, build, and test
         run: |
