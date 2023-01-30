@@ -55,7 +55,7 @@ const Home = () => {
                 // Close modal
             } else {
                 // TODO: Prettyfy alerts
-                alert('User is already in your friends list');
+                alert('User is already in your friends list or does not exist');
             }
 
         } catch (error) {
