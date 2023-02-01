@@ -1,6 +1,6 @@
 import { faCancel, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useContext, FC, useState } from 'react';
+import { useContext, FC } from 'react';
 import { ChatContext } from '../../Contexts/chat.context';
 import { UserContext } from '../../Contexts/user.context';
 import { Friend } from '../../models/friend';
