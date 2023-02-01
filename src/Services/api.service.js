@@ -36,3 +36,13 @@ export async function getMessages(messagesWith, accessToken) {
     const request = await fetch(url + 'Messages?with='+messagesWith  , apiBuidRequestInit(accessToken, "GET"));
     return await request.json();
 }
+
+export async function getFriendRequests(accessToken) {
+    const request = await fetch(url + 'Friend/requests'  , apiBuidRequestInit(accessToken, "GET"));
+    return await request.json();
+}
+
+export async function friendRequestRespond(friendRequest, accessToken) {
+    const request = await fetch(url + 'Friend'  , apiBuidRequestInit(accessToken, "PUT", friendRequest));
+    return await request.json();
+}

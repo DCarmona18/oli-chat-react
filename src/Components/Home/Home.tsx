@@ -11,12 +11,14 @@ import { Messages } from '../Messages/Messages';
 import { Textbox } from '../Textbox/Textbox';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { isValidEmail } from '../../Utils/helpers.utils';
-import { addFriend as addFriendService } from '../../Services/api.service';
+import { addFriend } from '../../Services/api.service';
 import { Friend } from '../../models/friend';
+import { FriendRequest } from '../../models/friendRequest';
+import { FriendRequestButton } from '../FriendRequestButton/FriendRequestButton';
 
 const Home = () => {
     const { currentUser } = useContext(UserContext);
-    const { sendMessage, connection, setFriends, friends } = useContext(ChatContext);
+    const { sendMessage, connection } = useContext(ChatContext);
     const [show, setShow] = useState(false);
     const [userToChat, setUserToChat] = useState<Friend | undefined>(undefined);
     const handleClose = () => {
@@ -36,26 +38,25 @@ const Home = () => {
     }, [currentUser, navigate]);
 
     const onSendMessage = (message: string) => {
-        userToChat !== undefined && 
-        message !== '' &&
-        sendMessage(userToChat.userId, message);
+        userToChat !== undefined &&
+            message !== '' &&
+            sendMessage(userToChat.userId, message);
     };
 
-    const addFriend = async () => {
+    const sendFriendRequest = async () => {
         const email = emailNewFriend.trim();
         try {
-            const friend: Friend = await addFriendService(email, currentUser?.accessToken);
-            if (friend.userId !== null) {
+            const friendRequest: FriendRequest = await addFriend(email, currentUser?.accessToken);
+            if (friendRequest.id !== null) {
                 setEmailNewFriend('');
                 handleClose();
                 // TODO: Prettyfy alerts
-                alert('New friend added');
+                alert('Request sent');
                 // Refresh friends list to the left
-                setFriends([friend].concat(friends));
-                // Close modal
+                // TODO: Trigger event to tell receiver "new friend request".
             } else {
                 // TODO: Prettyfy alerts
-                alert('User is already in your friends list or does not exist');
+                alert('User is already in your friends or the request hasn\'t been accepted.');
             }
 
         } catch (error) {
@@ -66,7 +67,6 @@ const Home = () => {
 
     const initializeChat = (friend: Friend) => {
         console.log("Initializing chat with:", friend);
-        
         setUserToChat(friend);
     }
 
@@ -106,17 +106,18 @@ const Home = () => {
                                                 <Button variant="secondary" onClick={handleClose}>
                                                     Close
                                                 </Button>
-                                                <Button disabled={!isValidEmail(emailNewFriend)} type='button' variant="primary" onClick={addFriend}>
+                                                <Button disabled={!isValidEmail(emailNewFriend)} type='button' variant="primary" onClick={sendFriendRequest}>
                                                     Save Changes
                                                 </Button>
                                             </Modal.Footer>
                                         </Modal>
                                         <Button variant='success' onClick={handleShow}><FontAwesomeIcon icon={faUserPlus} /></Button>
+                                        <FriendRequestButton currentUser={currentUser} />
                                     </div>
                                     <hr />
                                     <div className="card-body">
                                         <div className="row">
-                                            <div className="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
+                                            <div className="col-sm-2 col-md-4 col-lg-4 col-xl-4 mb-4 mb-md-0">
                                                 <div className="p-3">
                                                     <div className="input-group rounded mb-3 border-bottom">
                                                         <input type={"search"} className="form-control rounded" placeholder="Search" aria-label="Search"
@@ -128,7 +129,7 @@ const Home = () => {
                                                     <UsersList onChatInitializer={initializeChat} />
                                                 </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-7 col-xl-8">
+                                            <div className="col-sm-10 col-md-8 col-lg-8 col-xl-8">
                                                 <Messages key={'ChatMessages'} userToChat={userToChat} connectedUser={currentUser} />
                                                 <Textbox key={'textBox'} onSendMessage={(message) => onSendMessage(message)} />
                                             </div>
