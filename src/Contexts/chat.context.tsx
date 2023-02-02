@@ -12,6 +12,7 @@ interface IChatContext {
     sendMessage: (to: string, message: string) => void;
     registerEvent: (methodName: string, callback: (...args: any[]) => void) => void;
     setFriends: (friends: Friend[]) => void;
+    invokeHubMethod: <T, >(method: string, data: T) => void;
 }
 
 const defaultState: IChatContext = {
@@ -19,7 +20,8 @@ const defaultState: IChatContext = {
     friends: [],
     sendMessage: () => { },
     registerEvent: () => { },
-    setFriends: () => { }
+    setFriends: () => { },
+    invokeHubMethod: () => { },
 };
 
 interface Props {
@@ -107,7 +109,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
             message,
             type: 'PLAIN_TEXT'
         };
-        
+
         if (connection?.state === HubConnectionState.Connected) {
             try {
                 await connection.send('SendMessage', chatMessage);
@@ -123,11 +125,29 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         }
     };
 
+    const invokeHubMethod = async <T,>(method: string, data: T) => {
+        if (connection?.state === HubConnectionState.Connected) {
+            try {
+                await connection.send(method, data);
+            }
+            catch (e) {
+                // TODO: Handle errors
+                console.log(e);
+            }
+        }
+        else {
+            // TODO: Handle errors
+            alert('No connection to server yet.');
+
+            // TODO: Handle reconnection
+        }
+    };
+
     const registerEvent = (methodName: string, callback: (...args: any[]) => void) => {
         connection?.off(methodName);
         connection?.on(methodName, callback);
     };
 
-    const value = { connection, friends, sendMessage, registerEvent, setFriends };
+    const value = { connection, friends, sendMessage, registerEvent, setFriends, invokeHubMethod };
     return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
 };

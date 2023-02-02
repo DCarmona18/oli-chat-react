@@ -18,7 +18,7 @@ import { FriendRequestButton } from '../FriendRequestButton/FriendRequestButton'
 
 const Home = () => {
     const { currentUser } = useContext(UserContext);
-    const { sendMessage, connection } = useContext(ChatContext);
+    const { sendMessage, connection, invokeHubMethod } = useContext(ChatContext);
     const [show, setShow] = useState(false);
     const [userToChat, setUserToChat] = useState<Friend | undefined>(undefined);
     const handleClose = () => {
@@ -54,6 +54,7 @@ const Home = () => {
                 alert('Request sent');
                 // Refresh friends list to the left
                 // TODO: Trigger event to tell receiver "new friend request".
+                await invokeHubMethod('FriendRequestSent', friendRequest);
             } else {
                 // TODO: Prettyfy alerts
                 alert('User is already in your friends or the request hasn\'t been accepted.');
@@ -66,7 +67,7 @@ const Home = () => {
     };
 
     const initializeChat = (friend: Friend) => {
-        console.log("Initializing chat with:", friend);
+        console.info("Initializing chat with:", friend);
         setUserToChat(friend);
     }
 
@@ -76,6 +77,7 @@ const Home = () => {
                 <div className='w-100 m-auto form-signin'>
                     <img src={currentUser.avatarUrl} alt={"User profile"} className="rounded img-fluid img-thumbnail" referrerPolicy='no-referrer' />
                     <p className='w-100 m-auto'>{currentUser.fullName}</p>
+                    <p className='w-100 m-auto'>UserId {currentUser.id}</p>
                     <p className='w-100 m-auto'>{currentUser.email}</p>
                     <p className='w-100 m-auto'>{connection?.connectionId}</p>
                 </div>

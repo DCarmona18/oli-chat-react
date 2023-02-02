@@ -12,7 +12,7 @@ export type UsersListProps = {
 };
 
 export const UsersList: FC<UsersListProps> = ({onChatInitializer}) => {
-    const { setFriends, friends } = useContext(ChatContext);
+    const { setFriends, friends, registerEvent } = useContext(ChatContext);
     const { currentUser } = useContext(UserContext);
 
     const chatListElement = useRef<HTMLElement>();
@@ -28,14 +28,13 @@ export const UsersList: FC<UsersListProps> = ({onChatInitializer}) => {
         });
     }, [currentUser?.accessToken, setFriends]);
 
-    // const scrollChatlist = () => {
-    //     const curr = chatListElement.current;
-    //     if (curr) {
-    //         curr.scrollTo({
-    //             top: 0
-    //         });
-    //     }
-    // };
+    useEffect(() => {
+        registerEvent('FriendRequestAccepted', (friend: Friend) => {
+            // TODO: Prettyfy alerts
+            alert(`${friend.fullName} has accepted your friend request.`);
+            setFriends([friend].concat(friends));
+        });
+    }, [friends, registerEvent, setFriends])
     
     return (
         <PerfectScrollbar containerRef={el => (chatListElement.current = el)}>

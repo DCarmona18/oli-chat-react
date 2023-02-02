@@ -1,20 +1,28 @@
 import './FriendRequestButton.css'
 import { faUserClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { Badge, Button, Modal } from "react-bootstrap";
 import { User } from "../../models/user";
 import { FriendRequests } from '../FriendRequests/FriendRequests';
 import { UserContext } from '../../Contexts/user.context';
+import { ChatContext } from '../../Contexts/chat.context';
+import { FriendRequest } from '../../models/friendRequest';
 
 export type FriendRequestButtonProps = {
     currentUser: User | null;
 };
 
 export const FriendRequestButton: FC<FriendRequestButtonProps> = ({ currentUser }) => {
-    const { friendRequests } = useContext(UserContext);
+    const { friendRequests, setFriendRequests } = useContext(UserContext);
+    const { registerEvent } = useContext(ChatContext);
     const [showFR, setShow] = useState(false);
 
+    useEffect(() => {
+        registerEvent('NewFriendRequest', (friendRequest: FriendRequest) => {
+            setFriendRequests([friendRequest].concat(friendRequests));
+        });
+    }, [friendRequests, registerEvent, setFriendRequests])
 
     const handleShow = () => setShow(true);
     const handleClose = () => {

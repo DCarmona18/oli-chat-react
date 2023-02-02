@@ -15,7 +15,7 @@ export type FriendRequestsProps = {
 };
 
 export const FriendRequests: FC<FriendRequestsProps> = ({ friendRequests, currentUser }) => {
-    const { setFriends, friends } = useContext(ChatContext);
+    const { setFriends, friends, invokeHubMethod } = useContext(ChatContext);
     const { setFriendRequests } = useContext(UserContext);
 
     const accept = async (friendRequest: FriendRequest) => {
@@ -25,7 +25,7 @@ export const FriendRequests: FC<FriendRequestsProps> = ({ friendRequests, curren
             if (friend !== null) {
                 setFriendRequests(friendRequests.filter((fr) => fr.id !== friendRequest.id));
                 setFriends([friend].concat(friends));
-                // TODO: Trigger event to friend that invitation was accepted
+                await invokeHubMethod('FriendRequestAccepted', friend);
             } else {
                 // TODO: I forgot 
             }
