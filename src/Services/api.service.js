@@ -46,3 +46,8 @@ export async function friendRequestRespond(friendRequest, accessToken) {
     const request = await fetch(url + 'Friend'  , apiBuidRequestInit(accessToken, "PUT", friendRequest));
     return await request.json();
 }
+
+export async function seen(accessToken, friend) {
+    const request = await fetch(url + 'Messages/Seen'  , apiBuidRequestInit(accessToken, "POST", friend));
+    return await request.json();
+}

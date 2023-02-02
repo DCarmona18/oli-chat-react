@@ -11,7 +11,7 @@ import { Messages } from '../Messages/Messages';
 import { Textbox } from '../Textbox/Textbox';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { isValidEmail } from '../../Utils/helpers.utils';
-import { addFriend } from '../../Services/api.service';
+import { addFriend, seen } from '../../Services/api.service';
 import { Friend } from '../../models/friend';
 import { FriendRequest } from '../../models/friendRequest';
 import { FriendRequestButton } from '../FriendRequestButton/FriendRequestButton';
@@ -66,9 +66,18 @@ const Home = () => {
         }
     };
 
-    const initializeChat = (friend: Friend) => {
+    const initializeChat = async (friend: Friend) => {
         console.info("Initializing chat with:", friend);
         setUserToChat(friend);
+        seen(currentUser?.accessToken, friend).then((response: string[]) => {
+            // TODO: Set pending messages marked as seen
+            console.log("Seen messages list:", response)
+        })
+        .catch((error) => {
+
+            // TODO: Handle errors
+            console.error(error);
+        });
     }
 
     return (<>
