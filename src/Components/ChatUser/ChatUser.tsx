@@ -8,7 +8,7 @@ type ChatUserProps = {
 };
 
 
-export const ChatUser : FC<ChatUserProps> = ({user, onClick}) => {
+export const ChatUser: FC<ChatUserProps> = ({ user, onClick }) => {
 
     const startChat = () => {
         onClick(user);
@@ -19,7 +19,7 @@ export const ChatUser : FC<ChatUserProps> = ({user, onClick}) => {
             <button onClick={startChat} className="d-flex justify-content-between text-decoration-none">
                 <div className="d-flex flex-row">
                     <div>
-                        <img 
+                        <img
                             referrerPolicy='no-referrer'
                             src={user.avatarUrl}
                             alt="avatar" className="d-flex align-self-center me-3" width="60" />
@@ -27,12 +27,18 @@ export const ChatUser : FC<ChatUserProps> = ({user, onClick}) => {
                     </div>
                     <div className="pt-1">
                         <p className="fw-bold mb-0 text-start">{user.fullName}</p>
-                        <p className="small text-muted">{user.connectionId}</p>
+                        {user.latestMessage !== undefined && user.latestMessage.id !== '' &&
+                            <p className="small text-muted text-start">
+                                {user.latestMessage.message}
+                            </p>
+                        }
                     </div>
                 </div>
                 <div className="pt-1">
                     <p className="small text-muted mb-1">Just now</p>
-                    <span className="badge bg-danger rounded-pill float-end">3</span>
+                    {user.unseenMessages > 0 &&
+                        <span className="badge bg-danger rounded-pill float-end">{user.unseenMessages}</span>
+                    }
                 </div>
             </button>
         </li>

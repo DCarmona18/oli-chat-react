@@ -11,7 +11,7 @@ import { Messages } from '../Messages/Messages';
 import { Textbox } from '../Textbox/Textbox';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { isValidEmail } from '../../Utils/helpers.utils';
-import { addFriend, seen } from '../../Services/api.service';
+import { addFriend } from '../../Services/api.service';
 import { Friend } from '../../models/friend';
 import { FriendRequest } from '../../models/friendRequest';
 import { FriendRequestButton } from '../FriendRequestButton/FriendRequestButton';
@@ -67,17 +67,7 @@ const Home = () => {
     };
 
     const initializeChat = async (friend: Friend) => {
-        console.info("Initializing chat with:", friend);
         setUserToChat(friend);
-        seen(currentUser?.accessToken, friend).then((response: string[]) => {
-            // TODO: Set pending messages marked as seen
-            console.log("Seen messages list:", response)
-        })
-        .catch((error) => {
-
-            // TODO: Handle errors
-            console.error(error);
-        });
     }
 
     return (<>
@@ -137,13 +127,15 @@ const Home = () => {
                                                             <FontAwesomeIcon icon={faSearch} />
                                                         </span>
                                                     </div>
-                                                    <UsersList onChatInitializer={initializeChat} />
+                                                    <UsersList onChatInitializer={initializeChat} userToChat={userToChat}/>
                                                 </div>
                                             </div>
-                                            <div className="col-sm-10 col-md-8 col-lg-8 col-xl-8">
-                                                <Messages key={'ChatMessages'} userToChat={userToChat} connectedUser={currentUser} />
-                                                <Textbox key={'textBox'} onSendMessage={(message) => onSendMessage(message)} />
-                                            </div>
+                                            {userToChat !== undefined && userToChat.userId !== '' &&
+                                                <div className="col-sm-10 col-md-8 col-lg-8 col-xl-8">
+                                                    <Messages key={'ChatMessages'} userToChat={userToChat} connectedUser={currentUser} />
+                                                    <Textbox key={'textBox'} onSendMessage={(message) => onSendMessage(message)} />
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
