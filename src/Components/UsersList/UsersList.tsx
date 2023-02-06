@@ -37,7 +37,7 @@ export const UsersList: FC<UsersListProps> = ({ onChatInitializer, userToChat })
     useEffect(() => {
         registerEvent('NewMessage', (message: ChatMessage) => {
             const newFriends = friends.map((friend) => {
-                if (friend.userId === message.from) {
+                if(message.from === friend.userId || (message.from === currentUser?.id && message.to === friend.userId)) {
                     friend.latestMessage = message;
                     if (userToChat === undefined || userToChat.userId !== friend.userId) {
                         friend.unseenMessages++;

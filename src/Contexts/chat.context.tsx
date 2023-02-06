@@ -103,6 +103,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
     }, [friends, connection?.connectionId, currentUser?.email]);
 
     const sendMessage = async (to: string, message: string) => {
+        // TODO: Send user to chat to mark as seen
         // TODO: Structure the message object
         const chatMessage: ChatMessage = {
             to,

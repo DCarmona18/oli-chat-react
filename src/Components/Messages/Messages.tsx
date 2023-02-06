@@ -57,23 +57,25 @@ export const Messages: FC<MessagesProps> = ({ userToChat, connectedUser }) => {
 
     useEffect(() => {
         registerEvent('ReceiveMessage', (messageData: ChatMessage) => {
-            let type: MessageCategory = 'SENT';
-            let avatarUrl = connectedUser.avatarUrl;
-            if (messageData.to === connectedUser.id) {
-                type = 'INCOMING';
-                avatarUrl = userToChat?.avatarUrl ?? '';
+            if((userToChat !== undefined && userToChat.userId === messageData.from) || connectedUser.id === messageData.from) {
+                let type: MessageCategory = 'SENT';
+                let avatarUrl = connectedUser.avatarUrl;
+                if (messageData.to === connectedUser.id) {
+                    type = 'INCOMING';
+                    avatarUrl = userToChat?.avatarUrl ?? '';
+                }
+                
+                const message: MessageItemProps = {
+                    id: messageData.id!,
+                    text: messageData.message,
+                    time: new Date(Date.parse(messageData.sentAt?.toString() ?? '')).getTime(),
+                    avatarUrl: avatarUrl,
+                    type: type
+                }
+                setMessages([...messages, message])
             }
-
-            const message: MessageItemProps = {
-                id: messageData.id!,
-                text: messageData.message,
-                time: new Date(Date.parse(messageData.sentAt?.toString() ?? '')).getTime(),
-                avatarUrl: avatarUrl,
-                type: type
-            }
-            setMessages([...messages, message])
         });
-    }, [connectedUser.avatarUrl, connectedUser.id, messages, registerEvent, userToChat?.avatarUrl]);
+    }, [connectedUser.avatarUrl, connectedUser.id, messages, registerEvent, userToChat]);
 
     useEffect(() => {
         const curr = chatActiveElement.current;
