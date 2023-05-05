@@ -29,10 +29,10 @@ export const UsersList: FC<UsersListProps> = ({ onChatInitializer, userToChat })
                 setFriends(friends);
             })
             .catch((error) => {
-                // TODO: Log error
+                // ERROR: Log error
                 console.error(error);
             });
-    }, [currentUser?.accessToken, setFriends]);
+    }, []);
 
     useEffect(() => {
         registerEvent('NewMessage', (message: ChatMessage) => {
@@ -74,7 +74,7 @@ export const UsersList: FC<UsersListProps> = ({ onChatInitializer, userToChat })
     const initializeChatHandler = (friend: Friend) => {
         seen(currentUser?.accessToken, friend)
             .catch((error) => {
-                // TODO: Handle errors
+                // ERROR: Handle errors
                 console.error(error);
             });
         onChatInitializer(friend);

@@ -29,7 +29,7 @@ interface Props {
 export const UserProvider: React.FC<Props> = ({ children }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-
+    const [user, setUser] = useState<any>(null);
     const value = { currentUser, friendRequests, setCurrentUser, setFriendRequests };
     useEffect(() => {
         const unsubscribe = onAuthStateChangedListener(async (user: any) => {
@@ -41,12 +41,14 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
                     const userApi: User = await authenticateUser(user.accessToken, AUTH_TYPES.GOOGLE);
                     if (userApi !== null && userApi.id !== null) {
                         setCurrentUser({ ...userApi, accessToken: user.accessToken });
+                        setUser(user);
                     }
                 } catch (error) {
                     console.error(error);
                 }
             } else {
                 setCurrentUser(null);
+                setUser(null);
             }
 
         });
@@ -61,6 +63,33 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
                 setFriendRequests(friendsRequests);
         }
         fetchFriendRequests();
-    }, [currentUser?.accessToken]);
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            const intervalId = setInterval(() => {
+                user.getIdTokenResult().then((idTokenResult: any) => {
+                    const expiresIn = (new Date(idTokenResult.expirationTime)).getTime() - Date.now();
+
+                    // Check if the access token has expired or will expire soon
+                    if (expiresIn < 5 * 60 * 1000) {
+                        // The access token has expired or will expire in less than 5 minutes
+                        // Refresh the token
+                        user.getIdToken(/* forceRefresh */ true).then((refreshedToken: string) => {
+                            setCurrentUser({ ...currentUser as User, accessToken: refreshedToken });
+                            console.log("[TAG] Access token refreshed");
+                        }).catch((error: any) => {
+                            // ERROR: Handle errors
+                            console.error("Error refreshing access token:", error);
+                        });
+                    }
+                });
+                // We set the interval time to 55 minutes to ensure that the access token is always valid when the user is active.
+            }, 55 * 60 * 1000);
+
+            return () => clearInterval(intervalId);
+        }
+    }, [user]);
+
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 };

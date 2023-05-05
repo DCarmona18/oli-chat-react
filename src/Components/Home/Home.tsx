@@ -61,7 +61,7 @@ const Home = () => {
             }
 
         } catch (error) {
-            // TODO: Handle errors
+            // ERROR: Handle errors
             console.error(error);
         }
     };

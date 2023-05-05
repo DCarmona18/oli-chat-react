@@ -44,6 +44,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         const options: IHttpConnectionOptions = {
             headers: { 'Authorization': `Bearer ${currentUser.accessToken}` }
         };
+
         const newConnection = new HubConnectionBuilder()
             .withUrl(`${process.env.REACT_APP_API_URL}hubs/chat`, options)
             .withAutomaticReconnect()
@@ -61,7 +62,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
                 try {
                     await connection.start();
                 } catch (error) {
-                    // TODO: Handle errors
+                    // ERROR: Handle errors
                     console.log('Connection failed: ', error);
                 }
                 console.log("[TAG] Connection state:", connection.state, connection.connectionId);
@@ -116,12 +117,12 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
                 await connection.send('SendMessage', chatMessage);
             }
             catch (e) {
-                // TODO: Handle errors
+                // ERROR: Handle errors
                 console.log(e);
             }
         }
         else {
-            // TODO: Handle errors
+            // ERROR: Handle errors
             alert('No connection to server yet.');
         }
     };
@@ -132,12 +133,12 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
                 await connection.send(method, data);
             }
             catch (e) {
-                // TODO: Handle errors
+                // ERROR: Handle errors
                 console.log(e);
             }
         }
         else {
-            // TODO: Handle errors
+            // ERROR: Handle errors
             alert('No connection to server yet.');
 
             // TODO: Handle reconnection
