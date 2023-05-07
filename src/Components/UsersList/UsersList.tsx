@@ -32,7 +32,8 @@ export const UsersList: FC<UsersListProps> = ({ onChatInitializer, userToChat })
                 // ERROR: Log error
                 console.error(error);
             });
-    }, []);
+            // TODO: Review access Token in dep array
+    }, [currentUser?.accessToken, setFriends]);
 
     useEffect(() => {
         registerEvent('NewMessage', (message: ChatMessage) => {
