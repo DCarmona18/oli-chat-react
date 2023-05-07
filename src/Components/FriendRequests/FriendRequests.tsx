@@ -2,7 +2,6 @@ import { faCancel, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useContext, FC } from 'react';
 import { ChatContext } from '../../Contexts/chat.context';
-import { UserContext } from '../../Contexts/user.context';
 import { Friend } from '../../models/friend';
 import { FriendRequest, FriendRequestStatus } from '../../models/friendRequest';
 import { User } from '../../models/user';
@@ -15,8 +14,7 @@ export type FriendRequestsProps = {
 };
 
 export const FriendRequests: FC<FriendRequestsProps> = ({ friendRequests, currentUser }) => {
-    const { setFriends, friends, invokeHubMethod } = useContext(ChatContext);
-    const { setFriendRequests } = useContext(UserContext);
+    const { setFriends, friends, invokeHubMethod, setFriendRequests } = useContext(ChatContext);
 
     const accept = async (friendRequest: FriendRequest) => {
         friendRequest.status = FriendRequestStatus.Accepted;

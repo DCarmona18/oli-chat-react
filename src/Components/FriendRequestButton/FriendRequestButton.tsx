@@ -5,7 +5,6 @@ import { FC, useContext, useEffect, useState } from "react";
 import { Badge, Button, Modal } from "react-bootstrap";
 import { User } from "../../models/user";
 import { FriendRequests } from '../FriendRequests/FriendRequests';
-import { UserContext } from '../../Contexts/user.context';
 import { ChatContext } from '../../Contexts/chat.context';
 import { FriendRequest } from '../../models/friendRequest';
 
@@ -14,8 +13,7 @@ export type FriendRequestButtonProps = {
 };
 
 export const FriendRequestButton: FC<FriendRequestButtonProps> = ({ currentUser }) => {
-    const { friendRequests, setFriendRequests } = useContext(UserContext);
-    const { registerEvent } = useContext(ChatContext);
+    const { registerEvent, setFriendRequests, friendRequests } = useContext(ChatContext);
     const [showFR, setShow] = useState(false);
 
     useEffect(() => {

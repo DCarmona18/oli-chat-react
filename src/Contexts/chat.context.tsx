@@ -5,6 +5,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ChatMessage } from "../models/chatMessage";
 import { Friend } from "../models/friend";
 import { UserContext } from "./user.context";
+import { FriendRequest } from "../models/friendRequest";
+import { getFriendRequests } from "../Services/api.service";
 
 interface IChatContext {
     connection: HubConnection | null;
@@ -13,6 +15,8 @@ interface IChatContext {
     registerEvent: (methodName: string, callback: (...args: any[]) => void) => void;
     setFriends: (friends: Friend[]) => void;
     invokeHubMethod: <T, >(method: string, data: T) => void;
+    friendRequests: FriendRequest[];
+    setFriendRequests: (friendRequests: FriendRequest[]) => void;
 }
 
 const defaultState: IChatContext = {
@@ -22,6 +26,8 @@ const defaultState: IChatContext = {
     registerEvent: () => { },
     setFriends: () => { },
     invokeHubMethod: () => { },
+    friendRequests: [],
+    setFriendRequests: (friendRequests) => null
 };
 
 interface Props {
@@ -34,10 +40,9 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
     const [connection, setConnection] = useState<HubConnection | null>(null);
     const [friends, setFriends] = useState<Friend[]>([]);
     const { currentUser } = useContext(UserContext);
+    const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 
     useEffect(() => {
-        console.log("[TAG]Setting connection:", currentUser);
-
         if (!currentUser?.accessToken)
             return;
 
@@ -45,14 +50,15 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
             headers: { 'Authorization': `Bearer ${currentUser.accessToken}` }
         };
 
-        const newConnection = new HubConnectionBuilder()
+        const newConnectionBuilder = new HubConnectionBuilder()
             .withUrl(`${process.env.REACT_APP_API_URL}hubs/chat`, options)
             .withAutomaticReconnect()
-            .configureLogging(LogLevel.Information)
-            .build();
+            .configureLogging(LogLevel.Information);
+
+        const newConnection = newConnectionBuilder.build();
 
         setConnection(newConnection);
-    }, [currentUser]);
+    }, [currentUser?.accessToken]);
 
     useEffect(() => {
         console.info("[TAG] Setting up signalR");
@@ -100,8 +106,20 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         connection?.onclose(() => {
             console.info("[TAG] OnClose");
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [friends, connection?.connectionId, currentUser?.email]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connection]);
+
+    useEffect(() => {
+        async function fetchFriendRequests() {
+            const friendsRequests: FriendRequest[] = await getFriendRequests(currentUser?.accessToken);
+            if (friendsRequests !== null && friendsRequests.length > 0)
+                setFriendRequests(friendsRequests);
+        }
+
+        console.log("[TAG] Fetching friend requests");
+        fetchFriendRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const sendMessage = async (to: string, message: string) => {
         // TODO: Send user to chat to mark as seen
@@ -150,6 +168,6 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         connection?.on(methodName, callback);
     };
 
-    const value = { connection, friends, sendMessage, registerEvent, setFriends, invokeHubMethod };
+    const value = { connection, friends, friendRequests, sendMessage, registerEvent, setFriends, invokeHubMethod, setFriendRequests };
     return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
 };
