@@ -16,7 +16,7 @@ export const ChatUser: FC<ChatUserProps> = ({ user, onClick }) => {
 
     return (
         <li className="p-2 border-bottom">
-            <button onClick={startChat} className="d-flex justify-content-between text-decoration-none">
+            <button onClick={startChat} className="d-flex justify-content-between text-decoration-none w-100">
                 <div className="d-flex flex-row">
                     <div>
                         <img
