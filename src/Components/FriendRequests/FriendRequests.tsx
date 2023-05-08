@@ -28,7 +28,7 @@ export const FriendRequests: FC<FriendRequestsProps> = ({ friendRequests, curren
                 // TODO: I forgot 
             }
         } catch (error) {
-            // ERROR: Log error
+            // FIXME: Log error
             console.error(error);
         }
     };

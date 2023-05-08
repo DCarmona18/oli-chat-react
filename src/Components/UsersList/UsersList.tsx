@@ -29,7 +29,7 @@ export const UsersList: FC<UsersListProps> = ({ onChatInitializer, userToChat })
                 setFriends(friends);
             })
             .catch((error) => {
-                // ERROR: Log error
+                // FIXME: Log error
                 console.error(error);
             });
             // TODO: Review access Token in dep array
@@ -75,7 +75,7 @@ export const UsersList: FC<UsersListProps> = ({ onChatInitializer, userToChat })
     const initializeChatHandler = (friend: Friend) => {
         seen(currentUser?.accessToken, friend)
             .catch((error) => {
-                // ERROR: Handle errors
+                // FIXME: Handle errors
                 console.error(error);
             });
         onChatInitializer(friend);

@@ -68,7 +68,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
                 try {
                     await connection.start();
                 } catch (error) {
-                    // ERROR: Handle errors
+                    // FIXME: Handle errors
                     console.log('Connection failed: ', error);
                 }
                 console.log("[TAG] Connection state:", connection.state, connection.connectionId);
@@ -102,6 +102,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
 
         connection?.onreconnected(() => {
             console.info("[TAG] Reconnected");
+            // TODO: When reconnected refresh friend list, active chat messages, friend request list, friend request accepted maybe with a global variable
         });
 
         connection?.onclose(() => {
@@ -136,12 +137,12 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
                 await connection.send('SendMessage', chatMessage);
             }
             catch (e) {
-                // ERROR: Handle errors
+                // FIXME: Handle errors
                 console.log(e);
             }
         }
         else {
-            // ERROR: Handle errors
+            // FIXME: Handle errors
             alert('No connection to server yet.');
         }
     };
@@ -152,12 +153,12 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
                 await connection.send(method, data);
             }
             catch (e) {
-                // ERROR: Handle errors
+                // FIXME: Handle errors
                 console.log(e);
             }
         }
         else {
-            // ERROR: Handle errors
+            // FIXME: Handle errors
             alert('No connection to server yet.');
 
             // TODO: Handle reconnection

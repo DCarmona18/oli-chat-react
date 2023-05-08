@@ -61,7 +61,7 @@ const Home = () => {
             }
 
         } catch (error) {
-            // ERROR: Handle errors
+            // FIXME: Handle errors
             console.error(error);
         }
     };

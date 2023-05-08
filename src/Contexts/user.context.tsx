@@ -79,7 +79,7 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
                             setAccessToken(refreshedToken);
                             console.log("[INTERVAL] Access token refreshed");
                         }).catch((error: any) => {
-                            // ERROR: Handle errors
+                            // FIXME: Handle errors
                             console.error("Error refreshing access token:", error);
                         });
                     }
