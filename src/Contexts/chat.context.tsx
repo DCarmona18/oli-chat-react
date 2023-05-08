@@ -47,9 +47,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
             return;
 
         const options: IHttpConnectionOptions = {
-            accessTokenFactory() {
-                return currentUser?.accessToken;
-            },
+            headers: { 'Authorization': `Bearer ${currentUser.accessToken}` }
         };
 
         const newConnectionBuilder = new HubConnectionBuilder()
@@ -58,20 +56,32 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
             .configureLogging(LogLevel.Information);
 
         const newConnection = newConnectionBuilder.build();
-        newConnection.start().then(() => {
-            setConnection(newConnection);
-            console.log("[TAG] Connection state:", newConnection.state, newConnection.connectionId);
-        }).catch((error) => {
-            // FIXME: Handle errors
-            console.log('Connection failed: ', error);
-        });
+
+        setConnection(newConnection);
+    }, [currentUser?.accessToken]);
+
+    useEffect(() => {
+        console.info("[TAG] Setting up signalR");
+
+        async function setUpSignalR() {
+            if (connection) {
+                try {
+                    await connection.start();
+                } catch (error) {
+                    // ERROR: Handle errors
+                    console.log('Connection failed: ', error);
+                }
+                console.log("[TAG] Connection state:", connection.state, connection.connectionId);
+            }
+        }
+
+        setUpSignalR();
 
         return () => {
-            console.info("[TAG] Disconnecting:", newConnection?.state, newConnection?.connectionId)
-            newConnection?.stop();
+            console.info("[TAG] Disconnecting:", connection?.state, connection?.connectionId)
+            connection?.stop();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [connection]);
 
     useEffect(() => {
         registerEvent('ConnectedToHub', (user: Friend) => {
@@ -92,11 +102,13 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
 
         connection?.onreconnected(() => {
             console.info("[TAG] Reconnected");
+            // setIsConnectedToHub(true);
             // TODO: When reconnected refresh friend list, active chat messages, friend request list, friend request accepted maybe with a global variable
         });
 
         connection?.onclose(() => {
             console.info("[TAG] OnClose");
+            // setIsConnectedToHub(false);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connection]);
