@@ -69,7 +69,7 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
                     // Check if the access token has expired or will expire soon
                     console.log("[INTERVAL] Expires at: ", idTokenResult.expirationTime);
                     console.log("[INTERVAL] Expires in: ", expiresIn);
-                    if (expiresIn < 5 * 60 * 1000) {
+                    if (expiresIn < 6 * 60 * 1000) {
                         console.log("[INTERVAL] Expired!");
                         // The access token has expired or will expire in less than 5 minutes
                         // Refresh the token

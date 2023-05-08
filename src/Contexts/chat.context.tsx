@@ -97,6 +97,7 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         });
         connection?.onreconnecting((error) => {
             console.info("[TAG] Reconnecting");
+            // TODO: Validate if token is valid, if not refresh.
         });
 
         connection?.onreconnected(() => {
