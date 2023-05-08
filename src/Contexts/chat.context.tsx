@@ -61,33 +61,6 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         newConnection.start().then(() => {
             setConnection(newConnection);
             console.log("[TAG] Connection state:", newConnection.state, newConnection.connectionId);
-            
-            registerEvent('ConnectedToHub', (user: Friend) => {
-                console.info("[TAG] Connected to hub:", user);
-                // TODO: Set status of friend to online when connected
-                // if (user.connectionId !== connection?.connectionId && user.email !== currentUser?.email)
-                //     setFriends([user].concat(friends));
-            });
-            registerEvent('DisconnectedFromHub', (user: Friend) => {
-                console.info("[TAG] Disconnected from Hub:", user);
-                // TODO: Set status of friend to offline when disconnected
-                // setFriends(friends.filter((connectedUser: Friend) => connectedUser.userId !== user.userId))
-            });
-            newConnection?.onreconnecting((error) => {
-                console.info("[TAG] Reconnecting");
-                // TODO: Validate if token is valid, if not refresh.
-            });
-    
-            newConnection?.onreconnected(() => {
-                console.info("[TAG] Reconnected");
-                // TODO: When reconnected refresh friend list, active chat messages, friend request list, friend request accepted maybe with a global variable
-            });
-    
-            newConnection?.onclose(() => {
-                console.info("[TAG] OnClose");
-            });
-
-
         }).catch((error) => {
             // FIXME: Handle errors
             console.log('Connection failed: ', error);
@@ -99,6 +72,34 @@ export const ChatProvider: React.FC<Props> = ({ children }) => {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        registerEvent('ConnectedToHub', (user: Friend) => {
+            console.info("[TAG] Connected to hub:", user);
+            // TODO: Set status of friend to online when connected
+            // if (user.connectionId !== connection?.connectionId && user.email !== currentUser?.email)
+            //     setFriends([user].concat(friends));
+        });
+        registerEvent('DisconnectedFromHub', (user: Friend) => {
+            console.info("[TAG] Disconnected from Hub:", user);
+            // TODO: Set status of friend to offline when disconnected
+            // setFriends(friends.filter((connectedUser: Friend) => connectedUser.userId !== user.userId))
+        });
+        connection?.onreconnecting((error) => {
+            console.info("[TAG] Reconnecting");
+            // TODO: Validate if token is valid, if not refresh.
+        });
+
+        connection?.onreconnected(() => {
+            console.info("[TAG] Reconnected");
+            // TODO: When reconnected refresh friend list, active chat messages, friend request list, friend request accepted maybe with a global variable
+        });
+
+        connection?.onclose(() => {
+            console.info("[TAG] OnClose");
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connection]);
 
     useEffect(() => {
         async function fetchFriendRequests() {
